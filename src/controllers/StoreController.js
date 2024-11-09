@@ -15,16 +15,16 @@ class StoreController {
 
     OutputView.printProductList(this.store.products);
 
-    const purchaseDetails = await this.getValidPurchaseDetails(); // await 추가
-    console.log(purchaseDetails);
-
+    const purchaseDetails = await this.getValidPurchaseDetails();
+    this.store.updateStock(purchaseDetails);
+    OutputView.printProductList(this.store.products);
     OutputView.printThankYouMessage();
   }
 
   async getValidPurchaseDetails() {
     return handleInputWithValidation(
       InputView.readProductAndQuantity,
-      ValidationService.validateInput,
+      ValidationService.validatePurchaseInput,
       this.store.products,
     );
   }
