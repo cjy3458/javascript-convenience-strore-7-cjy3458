@@ -13,8 +13,8 @@ const ERROR = Object.freeze({
     name: 'ProductNotFoundError',
     message: `${ERROR_TAG} 존재하지 않는 상품입니다. 다시 입력해 주세요.`,
   },
-  STOCK_EXCEEDED: {
-    name: 'StockExceededError',
+  QUANTITY_EXCEEDED: {
+    name: 'QuantityExceededError',
     message: `${ERROR_TAG} 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.`,
   },
   INVALID_QUANTITY_TYPE: {
