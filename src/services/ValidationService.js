@@ -38,10 +38,6 @@ class ValidationService {
   }
 
   static validateProductExists(name, products) {
-    if (!Array.isArray(products)) {
-      throw new CustomError(ERROR.INVALID_PRODUCT_LIST);
-    }
-
     const product = products.find((p) => p.name === name);
     if (!product) {
       throw new CustomError(ERROR.PRODUCT_NOT_FOUND);
