@@ -14,7 +14,8 @@ class OutputView {
   }
 
   static formatProductMessage(product) {
-    const stockMessage = product.stock > 0 ? `${product.stock}개` : '재고 없음';
+    const stockMessage =
+      product.quantity > 0 ? `${product.quantity}개` : '재고 없음';
     const promotionMessage = product.promotion || '';
     return `- ${product.name} ${product.price.toLocaleString()}원 ${stockMessage} ${promotionMessage}`;
   }
