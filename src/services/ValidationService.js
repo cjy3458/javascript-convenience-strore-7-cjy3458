@@ -7,39 +7,45 @@ class ValidationService {
       throw new CustomError(ERROR.EMPTY_INPUT);
     }
 
+    const matches = this.validateInputFormat(input);
+    matches.forEach((item) => {
+      const [name, quantity] = this.parseItem(item);
+      this.validateProductExists(name, products);
+      this.validateStockAvailability(name, quantity, products);
+    });
+  }
+
+  static validateInputFormat(input) {
     const matches = input.match(/\[.+?-\d+]/g);
     if (!matches) {
       throw new CustomError(ERROR.INVALID_INPUT_FORMAT);
     }
-
-    matches.forEach((item) => {
-      const [name, quantity] = ValidationService.parseItem(item);
-      const product = products.find((p) => p.name === name);
-
-      if (!product) {
-        throw new CustomError(ERROR.PRODUCT_NOT_FOUND);
-      }
-
-      if (product.quantity < quantity) {
-        throw new CustomError(ERROR.QUANTITY_EXCEEDED);
-      }
-    });
+    return matches;
   }
 
   static parseItem(item) {
-    const matches = item.match(/^\[(.+)-(\d+)]$/);
-    if (!matches) {
+    const strippedItem = item.replace(/^\[|\]$/g, ''); // 앞뒤 대괄호만 제거
+    const [name, quantity] = strippedItem.split('-');
+
+    if (!name || !quantity || Number.isNaN(quantity)) {
       throw new CustomError(ERROR.INVALID_INPUT_FORMAT);
     }
 
-    const name = matches[1];
-    const quantity = Number(matches[2]);
+    return [name, Number(quantity)];
+  }
 
-    if (Number.isNaN(quantity) || quantity <= 0) {
-      throw new CustomError(ERROR.INVALID_QUANTITY_TYPE);
+  static validateProductExists(name, products) {
+    const product = products.find((p) => p.name === name);
+    if (!product) {
+      throw new CustomError(ERROR.PRODUCT_NOT_FOUND.replace('{name}', name));
     }
+  }
 
-    return [name, quantity];
+  static validateStockAvailability(name, quantity, products) {
+    const product = products.find((p) => p.name === name);
+    if (product.quantity < quantity) {
+      throw new CustomError(ERROR.QUANTITY_EXCEEDED.replace('{name}', name));
+    }
   }
 
   static validateYesNoDecision(decision) {
