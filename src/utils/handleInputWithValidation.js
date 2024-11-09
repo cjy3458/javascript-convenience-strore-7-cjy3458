@@ -7,8 +7,8 @@ export async function handleInputWithValidation(
 ) {
   try {
     const input = await inputFn();
-    validationFn(input, ...args);
-    return input;
+    const result = validationFn(input, ...args);
+    return result;
   } catch (error) {
     OutputView.printError(error.message, error.name);
     return handleInputWithValidation(inputFn, validationFn, ...args);
