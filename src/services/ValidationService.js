@@ -25,6 +25,7 @@ class ValidationService {
 
   static parseItem(item) {
     const strippedItem = item.replace(/^\[|\]$/g, '');
+
     const [name, quantity] = strippedItem.split('-');
 
     if (!name || !quantity || Number.isNaN(quantity)) {
