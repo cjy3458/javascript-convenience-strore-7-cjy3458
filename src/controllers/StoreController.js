@@ -10,7 +10,6 @@ class StoreController {
   }
 
   async start() {
-    // start 메서드를 async로 변경
     OutputView.printWelcomeMessage();
     this.store.initializeStore();
 
