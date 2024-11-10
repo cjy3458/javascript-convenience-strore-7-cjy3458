@@ -14,7 +14,7 @@ class ValidationService {
 
       ValidationService.validateStockAvailability(product, quantity);
 
-      return { name, quantity };
+      return { name, quantity, price: product.price };
     });
   }
 
@@ -46,7 +46,28 @@ class ValidationService {
   }
 
   static validateStockAvailability(product, quantity) {
-    if (product.quantity < quantity) {
+    const { promotionStock, quantity: normalStock, name, promotion } = product;
+
+    if (!promotion) {
+      if (quantity > normalStock) {
+        console.log(`[ERROR] Not enough stock for ${name}`);
+        throw new CustomError(ERROR.QUANTITY_EXCEEDED);
+      }
+      return;
+    }
+
+    const totalAvailableItems = product.quantity + product.promotionStock;
+
+    console.log(`[DEBUG] Checking stock for: ${name}`);
+    console.log(
+      `Promotion Stock: ${promotionStock}, Normal Stock: ${normalStock}`,
+    );
+    console.log(
+      `Requested Quantity: ${quantity}, Total Available Items: ${totalAvailableItems}`,
+    );
+
+    if (quantity > totalAvailableItems) {
+      console.log(`[ERROR] Not enough stock for ${name}`);
       throw new CustomError(ERROR.QUANTITY_EXCEEDED);
     }
   }
@@ -55,6 +76,7 @@ class ValidationService {
     if (!['Y', 'N'].includes(decision)) {
       throw new CustomError(ERROR.INVALID_PROMOTION_RESPONSE);
     }
+    return decision;
   }
 }
 
