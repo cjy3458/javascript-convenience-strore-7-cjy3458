@@ -60,9 +60,6 @@ class PromotionService {
       if (newGifts.length > 0) gifts.push(...newGifts);
     });
 
-    console.log('[DEBUG] Final Purchase Details:', updatedPurchaseDetails);
-    console.log('[DEBUG] Gifts:', gifts);
-
     return { gifts, updatedPurchaseDetails };
   }
 
