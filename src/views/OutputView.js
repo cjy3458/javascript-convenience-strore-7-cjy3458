@@ -7,17 +7,29 @@ class OutputView {
   }
 
   static printProductList(products) {
-    Console.print(MESSAGE.DISPLAY_PRODUCTS);
-    products.forEach((product) =>
-      Console.print(this.formatProductMessage(product)),
-    );
+    products.forEach((product) => {
+      console.log(OutputView.formatProductMessage(product));
+    });
   }
 
   static formatProductMessage(product) {
-    const stockMessage =
-      product.quantity > 0 ? `${product.quantity}개` : '재고 없음';
-    const promotionMessage = product.promotion || '';
-    return `- ${product.name} ${product.price.toLocaleString()}원 ${stockMessage} ${promotionMessage}`;
+    const messages = [];
+
+    if (product.promotionStock > 0) {
+      // 프로모션 상품 출력
+      messages.push(
+        `- ${product.name} ${product.price.toLocaleString()}원 ${product.promotionStock}개 ${product.promotion}`,
+      );
+    }
+
+    if (product.quantity > 0) {
+      // 일반 상품 출력
+      messages.push(
+        `- ${product.name} ${product.price.toLocaleString()}원 ${product.quantity}개`,
+      );
+    }
+
+    return messages.join('\n');
   }
 
   static printReceipt({
@@ -41,8 +53,8 @@ class OutputView {
 
   static printReceiptItems(items) {
     Console.print(MESSAGE.RECEIPT_ITEMS_HEADER);
-    items.forEach(({ name, quantity, price }) => {
-      Console.print(`${name}\t\t${quantity}\t${price.toLocaleString()}`);
+    items.forEach(({ name, quantity, totalPrice }) => {
+      Console.print(`${name}\t\t${quantity}\t${totalPrice.toLocaleString()}`);
     });
   }
 

@@ -12,9 +12,14 @@ class ValidationService {
       const [name, quantity] = ValidationService.parseItem(item);
       const product = ValidationService.validateProductExists(name, products);
 
+      // 디버깅 메시지 추가
+      console.log(`[DEBUG] Validating purchase input for: ${name}`);
+      console.log(`Requested Quantity: ${quantity}`);
+      console.log(`Product State:`, product);
+
       ValidationService.validateStockAvailability(product, quantity);
 
-      return { name, quantity };
+      return { name, quantity, price: product.price };
     });
   }
 
@@ -46,7 +51,40 @@ class ValidationService {
   }
 
   static validateStockAvailability(product, quantity) {
-    if (product.quantity < quantity) {
+    const { promotionStock, quantity: normalStock, name, promotion } = product;
+
+    // 프로모션 없는 경우 처리
+    if (!promotion) {
+      if (quantity > normalStock) {
+        console.log(`[ERROR] Not enough stock for ${name}`);
+        throw new CustomError(ERROR.QUANTITY_EXCEEDED);
+      }
+      return;
+    }
+    console.log(promotion);
+
+    // 프로모션 객체에서 buy, get 값 가져오기
+    // const { buy, get } = promotion;
+    // const bundleSize = 1 + 1;
+
+    // 프로모션 재고로 처리 가능한 번들 수
+    // const availablePromotionBundles = Math.floor(promotionStock / bundleSize);
+    // const maxPromotionItems = availablePromotionBundles * 1;
+
+    // 총 처리 가능한 재고
+    const totalAvailableItems = product.quantity + product.promotionStock;
+
+    console.log(`[DEBUG] Checking stock for: ${name}`);
+    console.log(
+      `Promotion Stock: ${promotionStock}, Normal Stock: ${normalStock}`,
+    );
+    console.log(
+      `Requested Quantity: ${quantity}, Total Available Items: ${totalAvailableItems}`,
+    );
+
+    // 요청 수량 초과 시 에러
+    if (quantity > totalAvailableItems) {
+      console.log(`[ERROR] Not enough stock for ${name}`);
       throw new CustomError(ERROR.QUANTITY_EXCEEDED);
     }
   }
@@ -55,6 +93,7 @@ class ValidationService {
     if (!['Y', 'N'].includes(decision)) {
       throw new CustomError(ERROR.INVALID_PROMOTION_RESPONSE);
     }
+    return decision;
   }
 }
 
