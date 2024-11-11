@@ -40,7 +40,6 @@ class PurchaseService {
     const membershipDiscount =
       await MembershipService.getMembershipDiscount(finalPurchaseDetails);
 
-    // ReceiptService를 통해 영수증 출력
     ReceiptService.printReceipt(
       finalPurchaseDetails,
       gifts,
