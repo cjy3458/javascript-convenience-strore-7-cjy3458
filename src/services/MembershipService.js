@@ -1,3 +1,4 @@
+import MEMBERSHIP from '../constants/config.js';
 import { handleInputWithValidation } from '../utils/handleInputWithValidation.js';
 import InputView from '../views/InputView.js';
 import ValidationService from './ValidationService.js';
@@ -17,8 +18,8 @@ class MembershipService {
         return total;
       }, 0);
 
-      const discountedAmount = nonDiscountedTotal * 0.3;
-      return Math.min(discountedAmount, 8000);
+      const discountedAmount = nonDiscountedTotal * MEMBERSHIP.DISCOUNT_RATE;
+      return Math.min(discountedAmount, MEMBERSHIP.MAX_DISCOUNT);
     }
 
     return 0;
