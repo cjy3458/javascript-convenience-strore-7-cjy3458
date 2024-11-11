@@ -1,3 +1,5 @@
+import { DateTimes } from '@woowacourse/mission-utils';
+
 class Promotion {
   constructor({ name, buy, get, startDate, endDate }) {
     this.name = name;
@@ -7,9 +9,9 @@ class Promotion {
     this.endDate = new Date(endDate);
   }
 
-  isApplicable(currentDate = new Date()) {
-    const today = new Date(currentDate);
-    return today >= this.startDate && today <= this.endDate;
+  isApplicable() {
+    const currentDate = new Date(DateTimes.now()); // 현재 날짜 가져오기
+    return currentDate >= this.startDate && currentDate <= this.endDate;
   }
 }
 
