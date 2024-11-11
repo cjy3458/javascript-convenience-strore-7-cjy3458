@@ -1,4 +1,4 @@
-import PromotionService from '../../src/services/PromotionService';
+import PromotionService from '../../src/services/PromotionService.js';
 
 describe('PromotionService 단위 테스트', () => {
   test('프로모션 조건 충족', () => {

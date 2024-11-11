@@ -10,7 +10,7 @@ class Promotion {
   }
 
   isApplicable() {
-    const currentDate = new Date(DateTimes.now()); // 현재 날짜 가져오기
+    const currentDate = new Date(DateTimes.now());
     return currentDate >= this.startDate && currentDate <= this.endDate;
   }
 }

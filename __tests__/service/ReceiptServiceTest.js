@@ -1,4 +1,4 @@
-import ReceiptService from '../../src/services/ReceiptService';
+import ReceiptService from '../../src/services/ReceiptService.js';
 
 describe('ReceiptService 단위 테스트 (영수증 출력)', () => {
   test('일반 상품 구매 영수증 출력', () => {
