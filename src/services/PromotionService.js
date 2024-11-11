@@ -60,9 +60,6 @@ class PromotionService {
       if (newGifts.length > 0) gifts.push(...newGifts);
     });
 
-    console.log('[DEBUG] Final Purchase Details:', updatedPurchaseDetails);
-    console.log('[DEBUG] Gifts:', gifts);
-
     return { gifts, updatedPurchaseDetails };
   }
 
@@ -166,15 +163,11 @@ class PromotionService {
 
     let newItem;
     if (decision === 'Y') {
-      console.log(item.quantity, '이거');
-      console.log(product.promotionStock, '이거');
       const usedPromotionStock = Math.min(
         item.quantity,
         product.promotionStock,
       );
-      console.log(usedPromotionStock);
       const usedNormalStock = item.quantity - usedPromotionStock;
-      console.log(item.quantity);
       product.reducePromotionStock(usedPromotionStock);
       product.reduceStock(usedNormalStock);
 
@@ -205,15 +198,6 @@ class PromotionService {
       providedFreeItems > 0
         ? [{ name: product.name, quantity: providedFreeItems }]
         : [];
-
-    console.log(`[DEBUG] Final updated quantity:`, {
-      originalQuantity: item.quantity,
-      shortage,
-      decision,
-      finalQuantity: newItem.quantity,
-    });
-
-    console.log(newItem, 'Dddd');
 
     return { newItem, newGifts };
   }

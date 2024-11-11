@@ -54,9 +54,6 @@ class StoreController {
         this.store,
       );
 
-    console.log('[DEBUG] Final Purchase Details:', finalPurchaseDetails);
-    console.log('[DEBUG] Gifts:', gifts);
-
     const membershipDiscount =
       await this.getMembershipDiscount(finalPurchaseDetails);
 
