@@ -14,48 +14,62 @@ class StoreController {
     OutputView.printWelcomeMessage();
     this.store.initializeStore();
 
-    await this.processPurchase();
+    await this.processPurchaseCycle();
 
     OutputView.printThankYouMessage();
+  }
+
+  async processPurchaseCycle() {
+    await this.processPurchase();
+
+    const continueShopping = await this.askForMorePurchase();
+    if (continueShopping) {
+      await this.processPurchaseCycle();
+    }
   }
 
   async processPurchase() {
     OutputView.printProductList(this.store.products);
 
     const purchaseDetails = await this.getValidPurchaseDetails();
-
-    // 추가 구매 여부 확인
     const validatedPurchaseDetails =
       await PromotionService.promptForAdditionalItems(
         purchaseDetails,
         this.store,
       );
 
-    // 프로모션 적용 및 증정품 계산
     const updatedPurchaseDetails = validatedPurchaseDetails.map((item) => {
       const product = this.store.products.find((p) => p.name === item.name);
       return {
         ...item,
         price: product.price,
         totalPrice: product.price * item.quantity,
+        isPromotion: product.promotionStock > 0,
       };
     });
 
-    // applyPromotions의 반환 값 비구조화
     const { gifts, updatedPurchaseDetails: finalPurchaseDetails } =
       await PromotionService.applyPromotions(
         updatedPurchaseDetails,
         this.store,
       );
-    console.log('=== Apply Promotions Debugging ===');
-    console.log('Final Purchase Details:', finalPurchaseDetails);
-    console.log('Gifts:', gifts);
 
-    // 재고 업데이트
-    this.store.updateStock([...finalPurchaseDetails, ...gifts]);
+    console.log('[DEBUG] Final Purchase Details:', finalPurchaseDetails);
+    console.log('[DEBUG] Gifts:', gifts);
 
-    // 최종 영수증 출력
-    this.printReceipt(finalPurchaseDetails, gifts);
+    const membershipDiscount =
+      await this.getMembershipDiscount(finalPurchaseDetails);
+
+    this.printReceipt(finalPurchaseDetails, gifts, membershipDiscount);
+  }
+
+  async askForMorePurchase() {
+    const decision = await handleInputWithValidation(
+      InputView.readMorePurchaseDecision,
+      ValidationService.validateYesNoDecision,
+    );
+
+    return decision === 'Y';
   }
 
   async getValidPurchaseDetails() {
@@ -66,10 +80,30 @@ class StoreController {
     );
   }
 
-  printReceipt(purchaseDetails, gifts) {
+  async getMembershipDiscount(purchaseDetails) {
+    const decision = await handleInputWithValidation(
+      InputView.readMembershipDecision,
+      ValidationService.validateYesNoDecision,
+    );
+
+    if (decision === 'Y') {
+      const nonDiscountedTotal = purchaseDetails.reduce((total, item) => {
+        if (!item.isPromotion) {
+          return total + item.totalPrice;
+        }
+        return total;
+      }, 0);
+
+      const discountedAmount = nonDiscountedTotal * 0.3;
+      return Math.min(discountedAmount, 8000);
+    }
+
+    return 0;
+  }
+
+  printReceipt(purchaseDetails, gifts, membershipDiscount) {
     const totalAmount = this.calculateTotalAmount(purchaseDetails);
     const promotionDiscount = this.calculatePromotionDiscount(gifts);
-    const membershipDiscount = 3000;
 
     const finalAmount = totalAmount - promotionDiscount - membershipDiscount;
 

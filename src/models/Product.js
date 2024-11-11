@@ -8,11 +8,15 @@ class Product {
   }
 
   reduceStock(amount) {
-    this.quantity -= amount;
+    this.quantity = Math.max(0, this.quantity - amount); // 음수 방지
   }
 
   reducePromotionStock(amount) {
-    this.promotionStock -= amount;
+    this.promotionStock = Math.max(0, this.promotionStock - amount); // 음수 방지
+  }
+
+  get isOutOfStock() {
+    return this.quantity === 0 && this.promotionStock === 0;
   }
 }
 

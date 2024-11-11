@@ -60,6 +60,9 @@ class PromotionService {
       if (newGifts.length > 0) gifts.push(...newGifts);
     });
 
+    console.log('[DEBUG] Final Purchase Details:', updatedPurchaseDetails);
+    console.log('[DEBUG] Gifts:', gifts);
+
     return { gifts, updatedPurchaseDetails };
   }
 
@@ -77,24 +80,19 @@ class PromotionService {
 
     const { buy, get } = promotion;
 
-    const totalBundles = Math.floor(item.quantity / buy);
-    const totalFreeItems = totalBundles * get;
-
-    const totalRequiredStock = item.quantity + totalFreeItems;
-
     const availablePromotionStock = Math.min(
       product.promotionStock,
-      totalRequiredStock,
+      item.quantity,
     );
     const usedBundles = Math.floor(availablePromotionStock / (buy + get));
     const discountedQuantity = usedBundles * (buy + get);
     const providedFreeItems = usedBundles * get;
 
     const remainingQuantity = item.quantity - discountedQuantity;
-    const shortage = totalRequiredStock - availablePromotionStock;
+    const shortage = item.quantity - availablePromotionStock;
 
     if (item.quantity > product.promotionStock) {
-      const shortageResult = await PromotionService.handleShortage(
+      return PromotionService.handleShortage(
         item,
         product,
         discountedQuantity,
@@ -102,9 +100,10 @@ class PromotionService {
         remainingQuantity,
         shortage,
       );
-      return shortageResult;
     }
+
     product.reducePromotionStock(availablePromotionStock);
+
     return {
       newItem: item,
       newGifts: [{ name: product.name, quantity: providedFreeItems }],
@@ -165,17 +164,41 @@ class PromotionService {
       ValidationService.validateYesNoDecision,
     );
 
-    console.log(decision);
-
     let newItem;
     if (decision === 'Y') {
+      console.log(item.quantity, '이거');
+      console.log(product.promotionStock, '이거');
+      const usedPromotionStock = Math.min(
+        item.quantity,
+        product.promotionStock,
+      );
+      console.log(usedPromotionStock);
+      const usedNormalStock = item.quantity - usedPromotionStock;
+      console.log(item.quantity);
+      product.reducePromotionStock(usedPromotionStock);
+      product.reduceStock(usedNormalStock);
+
       newItem = {
         ...item,
-        quantity: item.quantity,
         totalPrice: item.price * item.quantity,
       };
     } else {
-      newItem = { ...item, quantity: discountedQuantity };
+      const updatedQuantity = item.quantity - shortage;
+
+      const usedPromotionStock = Math.min(
+        updatedQuantity,
+        product.promotionStock,
+      );
+      const usedNormalStock = updatedQuantity - usedPromotionStock;
+
+      product.reducePromotionStock(usedPromotionStock);
+      product.reduceStock(usedNormalStock);
+
+      newItem = {
+        ...item,
+        quantity: updatedQuantity,
+        totalPrice: item.price * updatedQuantity,
+      };
     }
 
     const newGifts =
@@ -183,7 +206,14 @@ class PromotionService {
         ? [{ name: product.name, quantity: providedFreeItems }]
         : [];
 
-    product.reduceStock(shortage);
+    console.log(`[DEBUG] Final updated quantity:`, {
+      originalQuantity: item.quantity,
+      shortage,
+      decision,
+      finalQuantity: newItem.quantity,
+    });
+
+    console.log(newItem, 'Dddd');
 
     return { newItem, newGifts };
   }

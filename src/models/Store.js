@@ -17,7 +17,7 @@ class Store {
   loadProducts() {
     const filePath = path.resolve('public/products.md');
     const data = fs.readFileSync(filePath, 'utf-8').trim();
-    const [header, ...rows] = data.split('\n');
+    const [, ...rows] = data.split('\n');
 
     const promotions = this.loadPromotions();
 
@@ -45,6 +45,9 @@ class Store {
       if (promotion === 'null') {
         product.quantity += Number(quantity);
       } else {
+        if (quantity === 0) {
+          product.quantity = null;
+        }
         product.promotionStock += Number(quantity);
         product.promotion = promotion;
 
@@ -58,8 +61,6 @@ class Store {
       }
     });
 
-    console.log('[DEBUG] Loaded Products:', Array.from(productMap.values()));
-
     return Array.from(productMap.values()).map(
       (product) => new Product(product),
     );
@@ -68,7 +69,7 @@ class Store {
   loadPromotions() {
     const filePath = path.resolve('public/promotions.md');
     const data = fs.readFileSync(filePath, 'utf-8').trim();
-    const [header, ...rows] = data.split('\n');
+    const [, ...rows] = data.split('\n');
     return rows.map((row) => {
       const [name, buy, get, startDate, endDate] = row
         .split(',')
@@ -80,21 +81,6 @@ class Store {
         startDate,
         endDate,
       });
-    });
-  }
-
-  updateStock(items) {
-    items.forEach(({ name, quantity }) => {
-      const product = this.products.find((p) => p.name === name);
-
-      const usedPromotionStock = Math.min(quantity, product.promotionStock);
-      const remainingRequiredStock = quantity - usedPromotionStock;
-
-      product.reducePromotionStock(usedPromotionStock);
-
-      if (remainingRequiredStock > 0) {
-        product.reduceStock(remainingRequiredStock);
-      }
     });
   }
 }

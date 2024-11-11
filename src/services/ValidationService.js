@@ -46,11 +46,10 @@ class ValidationService {
   }
 
   static validateStockAvailability(product, quantity) {
-    const { promotionStock, quantity: normalStock, name, promotion } = product;
+    const { quantity: normalStock, promotion } = product;
 
     if (!promotion) {
       if (quantity > normalStock) {
-        console.log(`[ERROR] Not enough stock for ${name}`);
         throw new CustomError(ERROR.QUANTITY_EXCEEDED);
       }
       return;
@@ -58,16 +57,7 @@ class ValidationService {
 
     const totalAvailableItems = product.quantity + product.promotionStock;
 
-    console.log(`[DEBUG] Checking stock for: ${name}`);
-    console.log(
-      `Promotion Stock: ${promotionStock}, Normal Stock: ${normalStock}`,
-    );
-    console.log(
-      `Requested Quantity: ${quantity}, Total Available Items: ${totalAvailableItems}`,
-    );
-
     if (quantity > totalAvailableItems) {
-      console.log(`[ERROR] Not enough stock for ${name}`);
       throw new CustomError(ERROR.QUANTITY_EXCEEDED);
     }
   }

@@ -11,10 +11,6 @@ class Promotion {
     const today = new Date(currentDate);
     return today >= this.startDate && today <= this.endDate;
   }
-
-  reduceQuantity(quantity) {
-    this.quantity -= quantity;
-  }
 }
 
 export default Promotion;

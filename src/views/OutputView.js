@@ -8,25 +8,51 @@ class OutputView {
 
   static printProductList(products) {
     products.forEach((product) => {
-      console.log(OutputView.formatProductMessage(product));
+      Console.print(OutputView.formatProductMessage(product));
     });
   }
 
   static formatProductMessage(product) {
     const messages = [];
+    if (product.promotion) {
+      if (product.promotionStock > 0) {
+        messages.push(
+          `- ${product.name} ${product.price.toLocaleString()}원 ${product.promotionStock}개 ${product.promotion}`,
+        );
+      }
 
-    if (product.promotionStock > 0) {
-      messages.push(
-        `- ${product.name} ${product.price.toLocaleString()}원 ${product.promotionStock}개 ${product.promotion}`,
-      );
+      if (product.promotionStock <= 0) {
+        messages.push(
+          `- ${product.name} ${product.price.toLocaleString()}원 재고 없음 ${product.promotion}`,
+        );
+      }
+
+      if (product.quantity > 0) {
+        messages.push(
+          `- ${product.name} ${product.price.toLocaleString()}원 ${product.quantity}개`,
+        );
+      }
+
+      if (product.quantity <= 0) {
+        messages.push(
+          `- ${product.name} ${product.price.toLocaleString()}원 재고 없음`,
+        );
+      }
     }
 
-    if (product.quantity > 0) {
-      messages.push(
-        `- ${product.name} ${product.price.toLocaleString()}원 ${product.quantity}개`,
-      );
-    }
+    if (!product.promotion) {
+      if (product.quantity > 0) {
+        messages.push(
+          `- ${product.name} ${product.price.toLocaleString()}원 ${product.quantity}개`,
+        );
+      }
 
+      if (product.quantity <= 0) {
+        messages.push(
+          `- ${product.name} ${product.price.toLocaleString()}원 재고 없음`,
+        );
+      }
+    }
     return messages.join('\n');
   }
 
@@ -82,7 +108,7 @@ class OutputView {
       `${MESSAGE.RECEIPT_MEMBERSHIP_DISCOUNT}\t\t-${membershipDiscount.toLocaleString()}`,
     );
     Console.print(
-      `${MESSAGE.RECEIPT_FINAL_AMOUNT}\t\t${finalAmount.toLocaleString()}`,
+      `${MESSAGE.RECEIPT_FINAL_AMOUNT}\t\t\t${finalAmount.toLocaleString()}`,
     );
   }
 
