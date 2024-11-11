@@ -112,10 +112,6 @@ class OutputView {
     );
   }
 
-  static printThankYouMessage() {
-    Console.print(MESSAGE.THANK_YOU);
-  }
-
   static printError(message, name) {
     Console.print(`${message} (${name})\n`);
   }
